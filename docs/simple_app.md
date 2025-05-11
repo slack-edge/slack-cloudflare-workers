@@ -3,7 +3,11 @@
 If you haven't set up your project yet, please go through the steps [here](./index.md) first. With the project set up, it's time to dive into the code. Open `src/index.ts` and modify the source code as follows:
 
 ```typescript
-import { SlackApp, SlackEdgeAppEnv, isPostedMessageEvent } from "slack-cloudflare-workers";
+import {
+  SlackApp,
+  SlackEdgeAppEnv,
+  isPostedMessageEvent,
+} from "slack-cloudflare-workers";
 
 export default {
   async fetch(
@@ -139,4 +143,4 @@ wrangler secret put SLACK_SIGNING_SECRET
 wrangler secret put SLACK_BOT_TOKEN
 ```
 
-If you need more information about Cloudflare app development, please refer to [Cloudflware's documents](https://developers.cloudflare.com/workers/platform/deployments/).
+If you need more information about Cloudflare app development, please refer to [Cloudflare's documents](https://developers.cloudflare.com/workers/platform/deployments/).
