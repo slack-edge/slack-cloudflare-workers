@@ -1,8 +1,8 @@
 import { KVNamespace, KVNamespaceListResult } from "@cloudflare/workers-types";
 import {
-  AuthTestResponse,
   Authorize,
   AuthorizeError,
+  AuthTestResponse,
   ConfigError,
   Installation,
   InstallationStore,
@@ -11,6 +11,7 @@ import {
   SlackOAuthEnv,
   TokenRotator,
 } from "slack-edge";
+import { fromSerializableSlackAPIResponse, SerializableSlackAPIResponse, toSerializableSlackAPIResponse } from "./serializable-slack-api-response";
 
 /**
  * Options for initializing a KV Installation Store instance
@@ -219,21 +220,25 @@ export class KVInstallationStore<E extends SlackOAuthEnv> implements Installatio
    * @param token - The token to use for the request, and/or cache key.
    * @returns The response from the `auth.test` Slack API method.
    */
-  async callAuthTest(
+  private async callAuthTest(
     client: SlackAPIClient,
     token: string | undefined
   ): Promise<AuthTestResponse> {
     if (token && this.#authTestCacheEnabled && this.#authTestCacheNamespace) {
+      // Check the cache first
       const cachedResponse = await this.#authTestCacheNamespace.get(token);
       if (cachedResponse) {
-        return JSON.parse(cachedResponse);
+        const serializableAuthTestResponse = JSON.parse(cachedResponse) as SerializableSlackAPIResponse<AuthTestResponse>;
+        return fromSerializableSlackAPIResponse(serializableAuthTestResponse);
       }
 
+      // If not cached, call the API and cache the result
       const authTestResponse = await client.auth.test();
+      const serializableAuthTestResponse = toSerializableSlackAPIResponse(authTestResponse);
       const permanentCacheEnabled = this.#authTestCacheExpirationSecs <= 0;
       await this.#authTestCacheNamespace.put(
         token,
-        JSON.stringify(authTestResponse),
+        JSON.stringify(serializableAuthTestResponse),
         {
           expirationTtl: permanentCacheEnabled
             ? undefined
