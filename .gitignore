@@ -48,6 +48,9 @@ bower_components
 
 build/Release
 
+# editors
+.vscode
+
 # Dependency directories
 
 node_modules/
