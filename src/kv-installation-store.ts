@@ -11,7 +11,11 @@ import {
   SlackOAuthEnv,
   TokenRotator,
 } from "slack-edge";
-import { fromSerializableSlackAPIResponse, SerializableSlackAPIResponse, toSerializableSlackAPIResponse } from "./serializable-slack-api-response";
+import {
+  fromSerializableSlackAPIResponse,
+  SerializableSlackAPIResponse,
+  toSerializableSlackAPIResponse,
+} from "./serializable-slack-api-response";
 
 /**
  * Options for initializing a KV Installation Store instance
@@ -69,14 +73,11 @@ export class KVInstallationStore<E extends SlackOAuthEnv> implements Installatio
     });
 
     if (options.authTestCacheEnabled && !options.authTestCacheStorage) {
-      throw new ConfigError(
-        "authTestCacheStorage must be provided when authTestCacheEnabled is true"
-      );
+      throw new ConfigError("authTestCacheStorage must be provided when authTestCacheEnabled is true");
     }
     this.#authTestCacheEnabled = options.authTestCacheEnabled ?? false;
     this.#authTestCacheNamespace = options.authTestCacheStorage;
-    this.#authTestCacheExpirationSecs =
-      options.authTestCacheExpirationSecs ?? 10 * 60;
+    this.#authTestCacheExpirationSecs = options.authTestCacheExpirationSecs ?? 10 * 60;
   }
 
   async save(installation: Installation, request: Request | undefined = undefined) {
@@ -158,10 +159,7 @@ export class KVInstallationStore<E extends SlackOAuthEnv> implements Installatio
         const botClient = new SlackAPIClient(bot?.bot_token, {
           logLevel: this.#env.SLACK_LOGGING_LEVEL,
         });
-        const botAuthTest: AuthTestResponse = await this.callAuthTest(
-          botClient,
-          bot?.bot_token
-        );
+        const botAuthTest: AuthTestResponse = await this.callAuthTest(botClient, bot?.bot_token);
         const botScopes = botAuthTest.headers.get("x-oauth-scopes")?.split(",") ?? bot?.bot_scopes ?? [];
 
         const userQuery: InstallationStoreQuery = {};
@@ -220,10 +218,7 @@ export class KVInstallationStore<E extends SlackOAuthEnv> implements Installatio
    * @param token - The token to use for the request, and/or cache key.
    * @returns The response from the `auth.test` Slack API method.
    */
-  private async callAuthTest(
-    client: SlackAPIClient,
-    token: string | undefined
-  ): Promise<AuthTestResponse> {
+  private async callAuthTest(client: SlackAPIClient, token: string | undefined): Promise<AuthTestResponse> {
     if (token && this.#authTestCacheEnabled && this.#authTestCacheNamespace) {
       // Check the cache first
       const cachedResponse = await this.#authTestCacheNamespace.get(token);
@@ -236,15 +231,9 @@ export class KVInstallationStore<E extends SlackOAuthEnv> implements Installatio
       const authTestResponse = await client.auth.test();
       const serializableAuthTestResponse = toSerializableSlackAPIResponse(authTestResponse);
       const permanentCacheEnabled = this.#authTestCacheExpirationSecs <= 0;
-      await this.#authTestCacheNamespace.put(
-        token,
-        JSON.stringify(serializableAuthTestResponse),
-        {
-          expirationTtl: permanentCacheEnabled
-            ? undefined
-            : this.#authTestCacheExpirationSecs,
-        }
-      );
+      await this.#authTestCacheNamespace.put(token, JSON.stringify(serializableAuthTestResponse), {
+        expirationTtl: permanentCacheEnabled ? undefined : this.#authTestCacheExpirationSecs,
+      });
       return authTestResponse;
     } else {
       return await client.auth.test();
