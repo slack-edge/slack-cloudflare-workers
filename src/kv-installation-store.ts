@@ -227,7 +227,7 @@ export class KVInstallationStore<E extends SlackOAuthEnv> implements Installatio
         return fromSerializableSlackAPIResponse(serializableAuthTestResponse);
       }
 
-      // If not cached, call the API and cache the result
+      // If not cached, call the API and cache successful results
       const authTestResponse = await client.auth.test();
       if (authTestResponse?.ok && !authTestResponse.error) {
         const serializableAuthTestResponse = toSerializableSlackAPIResponse(authTestResponse);
