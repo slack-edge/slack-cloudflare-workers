@@ -229,11 +229,13 @@ export class KVInstallationStore<E extends SlackOAuthEnv> implements Installatio
 
       // If not cached, call the API and cache the result
       const authTestResponse = await client.auth.test();
-      const serializableAuthTestResponse = toSerializableSlackAPIResponse(authTestResponse);
-      const permanentCacheEnabled = this.#authTestCacheExpirationSecs <= 0;
-      await this.#authTestCacheNamespace.put(token, JSON.stringify(serializableAuthTestResponse), {
-        expirationTtl: permanentCacheEnabled ? undefined : this.#authTestCacheExpirationSecs,
-      });
+      if (authTestResponse?.ok && !authTestResponse.error) {
+        const serializableAuthTestResponse = toSerializableSlackAPIResponse(authTestResponse);
+        const permanentCacheEnabled = this.#authTestCacheExpirationSecs <= 0;
+        await this.#authTestCacheNamespace.put(token, JSON.stringify(serializableAuthTestResponse), {
+          expirationTtl: permanentCacheEnabled ? undefined : this.#authTestCacheExpirationSecs,
+        });
+      }
       return authTestResponse;
     } else {
       return await client.auth.test();
