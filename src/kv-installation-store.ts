@@ -230,18 +230,33 @@ export class KVInstallationStore<E extends SlackOAuthEnv> implements Installatio
       // If not cached, call the API and cache successful results
       const authTestResponse = await client.auth.test();
       if (authTestResponse?.ok && !authTestResponse.error) {
-        const serializableAuthTestResponse = toSerializableSlackAPIResponse(authTestResponse);
-        const permanentCacheEnabled = this.#authTestCacheExpirationSecs <= 0;
-        await this.#authTestCacheNamespace.put(token, JSON.stringify(serializableAuthTestResponse), {
-          expirationTtl: permanentCacheEnabled ? undefined : this.#authTestCacheExpirationSecs,
-        });
+        await this.cacheAuthTestResponse(token, authTestResponse);
       }
       return authTestResponse;
     } else {
       return await client.auth.test();
     }
   }
+
+  /**
+   * Caches the auth.test response in the KV cache.
+   * If the operation fails, it does not throw.
+   * @param token - The token to use for the cache key.
+   * @param authTestResponse - The auth.test response to cache.
+   */
+  private async cacheAuthTestResponse(token: string, authTestResponse: AuthTestResponse) {
+    try {
+      const serializableAuthTestResponse = toSerializableSlackAPIResponse(authTestResponse);
+      const permanentCacheEnabled = this.#authTestCacheExpirationSecs <= 0;
+      await this.#authTestCacheNamespace!.put(token, JSON.stringify(serializableAuthTestResponse), {
+          expirationTtl: permanentCacheEnabled ? undefined : this.#authTestCacheExpirationSecs,
+      });
+    } catch (e) {
+      console.error(`Failed to cache auth.test response for token ${token}: ${e}`);
+    }
+  }
 }
+
 
 export function toBotInstallationQuery(clientId: string, q: InstallationStoreQuery): string {
   const e = q.enterpriseId ? q.enterpriseId : "_";
