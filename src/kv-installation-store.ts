@@ -249,7 +249,7 @@ export class KVInstallationStore<E extends SlackOAuthEnv> implements Installatio
       const serializableAuthTestResponse = toSerializableSlackAPIResponse(authTestResponse);
       const permanentCacheEnabled = this.#authTestCacheExpirationSecs <= 0;
       await this.#authTestCacheNamespace!.put(token, JSON.stringify(serializableAuthTestResponse), {
-          expirationTtl: permanentCacheEnabled ? undefined : this.#authTestCacheExpirationSecs,
+        expirationTtl: permanentCacheEnabled ? undefined : this.#authTestCacheExpirationSecs,
       });
     } catch (e) {
       console.error(`Failed to cache auth.test response for token "${token?.slice(0, 10)}...": ${e}`);
