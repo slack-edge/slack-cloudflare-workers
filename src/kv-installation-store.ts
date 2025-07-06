@@ -252,7 +252,7 @@ export class KVInstallationStore<E extends SlackOAuthEnv> implements Installatio
           expirationTtl: permanentCacheEnabled ? undefined : this.#authTestCacheExpirationSecs,
       });
     } catch (e) {
-      console.error(`Failed to cache auth.test response for token ${token}: ${e}`);
+      console.error(`Failed to cache auth.test response for token "${token?.slice(0, 10)}...": ${e}`);
     }
   }
 }
