@@ -257,7 +257,6 @@ export class KVInstallationStore<E extends SlackOAuthEnv> implements Installatio
   }
 }
 
-
 export function toBotInstallationQuery(clientId: string, q: InstallationStoreQuery): string {
   const e = q.enterpriseId ? q.enterpriseId : "_";
   const t = q.teamId && !q.isEnterpriseInstall ? q.teamId : "_";
