@@ -138,8 +138,13 @@ export class KVInstallationStore<E extends SlackOAuthEnv> implements Installatio
         teamId: req.context.teamId,
         userId: req.context.userId,
       };
+
+      let bot: Installation | undefined = undefined;
+      let botClient: SlackAPIClient | undefined = undefined;
+      let botAuthTest: AuthTestResponse | undefined = undefined;
+      let botScopes: string[] = [];
       try {
-        const bot = await this.findBotInstallation(query);
+        bot = await this.findBotInstallation(query);
         if (bot && bot.bot_refresh_token) {
           const maybeRefreshed = await this.#tokenRotator.performRotation({
             bot: {
@@ -156,12 +161,20 @@ export class KVInstallationStore<E extends SlackOAuthEnv> implements Installatio
           }
         }
 
-        const botClient = new SlackAPIClient(bot?.bot_token, {
+        if (!bot?.bot_token) {
+          throw new Error("Failed to find bot_token in bot installation");
+        }
+
+        botClient = new SlackAPIClient(bot?.bot_token, {
           logLevel: this.#env.SLACK_LOGGING_LEVEL,
         });
-        const botAuthTest: AuthTestResponse = await this.callAuthTest(botClient, bot?.bot_token);
-        const botScopes = botAuthTest.headers.get("x-oauth-scopes")?.split(",") ?? bot?.bot_scopes ?? [];
+        botAuthTest = await this.callAuthTest(botClient, bot?.bot_token);
+        botScopes = botAuthTest.headers.get("x-oauth-scopes")?.split(",") ?? bot?.bot_scopes ?? [];
+      } catch (e) {
+        throw new AuthorizeError(`Failed to authorize bot (error: ${e}, slack client id: ${this.#env.SLACK_CLIENT_ID}, bot token: ${bot?.bot_token ? bot.bot_token.slice(0, 6) + "..." : bot?.bot_token}, query: ${JSON.stringify(query)})`);
+      }
 
+      try {
         const userQuery: InstallationStoreQuery = {};
         Object.assign(userQuery, query);
         if (this.#env.SLACK_USER_TOKEN_RESOLUTION !== "installer") {
@@ -207,7 +220,7 @@ export class KVInstallationStore<E extends SlackOAuthEnv> implements Installatio
           userScopes: user?.user_scopes,
         };
       } catch (e) {
-        throw new AuthorizeError(`Failed to authorize (error: ${e}, query: ${JSON.stringify(query)})`);
+        throw new AuthorizeError(`Failed to authorize user (error: ${e}, slack client id: ${this.#env.SLACK_CLIENT_ID}, query: ${JSON.stringify(query)})`);
       }
     };
   }
