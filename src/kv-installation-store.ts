@@ -172,7 +172,9 @@ export class KVInstallationStore<E extends SlackOAuthEnv> implements Installatio
         botAuthTest = await this.callAuthTest(botClient, bot?.bot_token);
         botScopes = botAuthTest.headers.get("x-oauth-scopes")?.split(",") ?? bot?.bot_scopes ?? [];
       } catch (e) {
-        throw new AuthorizeError(`Failed to authorize bot (error: ${e}, slack client id: ${this.#env.SLACK_CLIENT_ID}, bot token: ${bot?.bot_token ? bot.bot_token.slice(0, 6) + "..." : bot?.bot_token}, query: ${JSON.stringify(query)})`);
+        throw new AuthorizeError(
+          `Failed to authorize bot (error: ${e}, slack client id: ${this.#env.SLACK_CLIENT_ID}, bot token: ${bot?.bot_token ? bot.bot_token.slice(0, 6) + "..." : bot?.bot_token}, query: ${JSON.stringify(query)})`,
+        );
       }
 
       try {
@@ -221,7 +223,9 @@ export class KVInstallationStore<E extends SlackOAuthEnv> implements Installatio
           userScopes: user?.user_scopes,
         };
       } catch (e) {
-        throw new AuthorizeError(`Failed to authorize user (error: ${e}, slack client id: ${this.#env.SLACK_CLIENT_ID}, query: ${JSON.stringify(query)})`);
+        throw new AuthorizeError(
+          `Failed to authorize user (error: ${e}, slack client id: ${this.#env.SLACK_CLIENT_ID}, query: ${JSON.stringify(query)})`,
+        );
       }
     };
   }

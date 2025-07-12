@@ -27,11 +27,11 @@
   },
   "homepage": "https://github.com/slack-edge/slack-cloudflare-workers#readme",
   "dependencies": {
-    "@cloudflare/workers-types": "^4.20250705.0",
-    "slack-edge": "^1.3.10"
+    "@cloudflare/workers-types": "^4.20250712.0",
+    "slack-edge": "^1.3.11"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.0.6",
+    "@biomejs/biome": "^2.1.1",
     "typescript": "^5.8.3"
   }
 }
