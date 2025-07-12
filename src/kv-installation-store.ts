@@ -162,7 +162,8 @@ export class KVInstallationStore<E extends SlackOAuthEnv> implements Installatio
         }
 
         if (!bot?.bot_token) {
-          throw new Error("Failed to find bot_token in bot installation");
+          // this exception will be caught below and rethrown as an AuthorizeError
+          throw new Error("No bot token found in in bot installation");
         }
 
         botClient = new SlackAPIClient(bot?.bot_token, {
