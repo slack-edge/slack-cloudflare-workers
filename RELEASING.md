@@ -34,5 +34,4 @@ Publishing is manual, following the same pattern as [`slack-edge`](https://githu
 
 ## Notes
 
-- Tags through `1.3.9` use bare semver (no prefix). The `v` prefix is the going-forward convention starting with the next release, matching `slack-edge`.
 - If you'd rather not pass `--tag-version-prefix=v` every time, set it once globally: `npm config set tag-version-prefix v`.
