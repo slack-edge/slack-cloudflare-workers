@@ -1,0 +1,15 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "workspaces": {
+    ".": {},
+    "examples/simple-app": {
+      "entry": ["src/structured.ts"],
+      "ignoreBinaries": ["wrangler"],
+      "ignoreDependencies": ["wrangler"]
+    },
+    "examples/oauth-app": {
+      "ignoreBinaries": ["wrangler"],
+      "ignoreDependencies": ["wrangler"]
+    }
+  }
+}

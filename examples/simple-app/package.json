@@ -4,16 +4,11 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20231025.0",
     "typescript": "^5.2.2",
-    "vitest": "^0.34.6",
     "wrangler": "^3.15.0"
   },
   "private": true,
   "scripts": {
     "start": "wrangler dev",
-    "deploy": "wrangler publish",
-    "test": "vitest"
-  },
-  "dependencies": {
-    "prettier": "^3.0.3"
+    "deploy": "wrangler publish"
   }
 }
