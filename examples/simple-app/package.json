@@ -2,9 +2,9 @@
   "name": "simple-app",
   "version": "0.0.0",
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260511.1",
-    "typescript": "^6.0.3",
-    "wrangler": "^4.90.1"
+    "@cloudflare/workers-types": "^5.20260927.1",
+    "typescript": "^7.0.2",
+    "wrangler": "^4.141.0"
   },
   "private": true,
   "scripts": {
